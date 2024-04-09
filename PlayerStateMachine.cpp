@@ -99,6 +99,18 @@ void Player::HandleCollision(Entity* entity){
     }
 }
 
+void Player::HandleTileCollision(int pix, auto allTiles, std::vector<std::vector<int>> grid){
+    int tileXPos = (int) hitboxPos.x/pix;
+    int tileYPos = (int) hitboxPos.y/pix;
+    targetTile = {tileXPos, tileYPos};
+
+    if(allTiles[grid[tileYPos][tileXPos]].has_collision){
+        isColliding = true;
+    } else {
+        isColliding = false;
+    }
+}
+
 //Player::Player(Vector2 pos, float rad, float spd, int hp)
 Player::Player(Vector2 pos, float rad, float spd, int hp){
     // Entity Based Variables
@@ -110,6 +122,7 @@ Player::Player(Vector2 pos, float rad, float spd, int hp){
     _buffed = false;
     _damaged = false;
     _healthPoints = hp;
+    isColliding = false;
     
     // Player Based Variables
     timer = 0;
@@ -156,6 +169,7 @@ void PlayerIdle::Update(Player& player, float delta_time){
 
 void PlayerMoving::Update(Player& player, float delta_time){
     player.velocity = Vector2Zero();
+
     if(IsKeyDown(KEY_W)){
         player.velocity.y =  -1*(player._speed * player._speedMultiplier);
     }
@@ -168,10 +182,15 @@ void PlayerMoving::Update(Player& player, float delta_time){
     if(IsKeyDown(KEY_D)){
         player.velocity.x = (player._speed * player._speedMultiplier);
     }
-    if(IsKeyPressed(KEY_SPACE)){
+    if(!player.isColliding && IsKeyPressed(KEY_SPACE)){
         player.SetState(&player.dodging);
     }
-    player._position = Vector2Add(player._position, Vector2Scale(player.velocity, delta_time));
+
+    if(player.isColliding){
+        player._position = player._position;
+    } else {
+        player._position = Vector2Add(player._position, Vector2Scale(player.velocity, delta_time));
+    } 
 
     if(IsMouseButtonDown(0)) {
         player.SetState(&player.attacking);
@@ -185,7 +204,12 @@ void PlayerMoving::Update(Player& player, float delta_time){
 }
 
 void PlayerDodging::Update(Player& player, float delta_time){
-    player._position = Vector2Add(player._position, Vector2Scale(Vector2Scale(player.velocity, delta_time), 10.0f));
+    if(player.isColliding){
+        player._position =  Vector2Add(player._position, Vector2Zero());
+    } else {
+        player._position = Vector2Add(player._position, Vector2Scale(Vector2Scale(player.velocity, delta_time), 10.0f));
+        player.hitboxPos = {player._position.x + player.velocity.x/(player._speed * player._speedMultiplier)*(player._radius + 25.0f), player._position.y + player.velocity.y/(player._speed * player._speedMultiplier)*(player._radius + 25.0f)};
+    }
     player.timer += delta_time;
     if(player.timer > 0.125){
         player.timer = 0;

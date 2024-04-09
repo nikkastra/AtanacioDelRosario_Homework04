@@ -11,14 +11,25 @@
 const int WINDOW_WIDTH = 1280;
 const int WINDOW_HEIGHT = 720;
 const float FPS = 60;
-const int PIXELS = 16;
+const int PIXELS = 128;
+
+class Entity;
 
 struct Tile{
     Rectangle locationInSpriteSheet;
     bool has_collision;
 };
 
-Tile* allTiles = new Tile[2];
+Tile* allTiles = new Tile[20];
+int notWallTiles[] = {1, 6, 7, 8, 10};
+std::vector<std::vector<int>> grid;
+
+bool isNotWallTile(int i){
+    for(auto x : notWallTiles){
+        if(i == x) return true;
+    }
+    return false;
+}
 
 int main(){
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "miss ko na siya");
@@ -41,7 +52,6 @@ int main(){
     Vector2 enemyOne;
     Vector2 enemyTwo;
     Vector2 enemyThree;
-    std::vector<std::vector<int>> grid;
 
     FILE* configFile = fopen("level1.txt", "r");
     if (configFile) {
@@ -56,6 +66,7 @@ int main(){
         fscanf(configFile, "ENEMY_THREE_POS %i %i\n", &e3x, &e3y);
         enemyThree = {(float) e3x, (float) e3y};
         fscanf(configFile, "TILE_COUNT %i\n", &tileCount);
+        
         int h,w,x,y;
         for(int i = 0; i < tileCount; i++){
             fscanf(configFile, "%i %i %i %i\n", &x, &y, &w, &h);
@@ -63,6 +74,12 @@ int main(){
             allTiles[i].locationInSpriteSheet.y = y;
             allTiles[i].locationInSpriteSheet.width = w;
             allTiles[i].locationInSpriteSheet.height = h;
+            if(isNotWallTile(i)){
+                allTiles[i].has_collision = false;
+            } else {
+                allTiles[i].has_collision = true;
+            }
+            std::cout << i << "|" << allTiles[i].has_collision << std::endl;
         }
         fscanf(configFile, "GRID %i %i\n", &gridSizeX, &gridSizeY);
         for(int i = 0; i < gridSizeY; i++){
@@ -87,13 +104,12 @@ int main(){
     Enemy enemy1(enemyOne, 100.0f, 100.0f, 2); // for enemy Vector2 pos, float sz, float spd, int hp
     Enemy enemy2(enemyTwo, 100.0f, 100.0f, 2);
     Enemy enemy3(enemyThree, 100.0f, 100.0f, 2);
-    std::cout << enemy3._position.x << "|" << enemy3._position.y << std::endl;
 
-    Item item1 ({0, 0}, 31,2,1);
-    Item item2 ({WINDOW_WIDTH/2 + 400, WINDOW_HEIGHT/9 + 200}, 31,2,1);
-    Item item3 ({WINDOW_WIDTH/9 + 150, WINDOW_HEIGHT/2 + 200}, 31,2,1);
-    Item item4 ({WINDOW_WIDTH/2 + 1000, WINDOW_HEIGHT + 200}, 31,2,1);
-    Item item5 ({WINDOW_WIDTH, WINDOW_HEIGHT}, 31,2,1);
+    Item item1 ({1536, 1536}, 31,2,1);
+    Item item2 ({2816, 2816}, 31,2,1);
+    Item item3 ({3840, 1280}, 31,2,1);
+    Item item4 ({2560, 3328}, 31,2,1);
+    Item item5 ({4200, 3456}, 31,2,1);
 
     Texture tileMap = LoadTexture(tilesetName);
 
@@ -103,6 +119,8 @@ int main(){
         camera_view.target = player._position;
 
         player.Update(delta_time);
+        player.HandleTileCollision(PIXELS, allTiles, grid);
+
         if(enemy1._healthPoints > 0){
             player.HandleCollision(&enemy1);
             enemy1.Update(delta_time);

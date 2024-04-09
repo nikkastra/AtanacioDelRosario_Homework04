@@ -14,6 +14,9 @@ public:
     float _buffTimer;
     int _healthPoints;
 
+    Vector2 velocity;
+    bool isColliding;
+    Vector2 targetTile;
 
     float _damage;
     bool _damaged;

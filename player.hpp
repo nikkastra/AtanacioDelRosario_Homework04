@@ -75,6 +75,8 @@ public:
 
     void HandleCollision(Entity* entity);
 
+    void HandleTileCollision(int pix, auto allTiles, std::vector<std::vector<int>> grid);
+
 private:
     PlayerState* current_state;
 };

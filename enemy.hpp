@@ -52,8 +52,6 @@ public:
     //Player* player;
 
     Color color;
-
-    Vector2 velocity;
     float rotation;
 
     Vector2 bodyCenter;
