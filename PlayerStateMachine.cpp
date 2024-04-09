@@ -199,7 +199,7 @@ void PlayerMoving::Update(Player& player, float delta_time){
     if(Vector2Length(player.velocity) == 0) {
         player.SetState(&player.idle);
     } else {
-        player.hitboxPos = {player._position.x + player.velocity.x/(player._speed * player._speedMultiplier)*(player._radius + 25.0f), player._position.y + player.velocity.y/player._speed*(player._radius + 25.0f)};
+        player.hitboxPos = {player._position.x + player.velocity.x/(player._speed * player._speedMultiplier)*(player._radius + 25.0f), player._position.y + player.velocity.y/(player._speed * player._speedMultiplier)*(player._radius + 25.0f)};
     }
 }
 

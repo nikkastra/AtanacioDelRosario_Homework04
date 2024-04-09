@@ -31,6 +31,31 @@ bool isNotWallTile(int i){
     return false;
 }
 
+void saveFile(Entity entities[]){
+    FILE * pFile;
+    pFile = fopen ("saveslot.txt","w");
+
+    fprintf(pFile, "PLAYER %i \n", entities[0]._healthPoints);
+    fprintf(pFile, "POSITION %f %f\n", entities[0]._position.x, entities[0]._position.y);
+
+    fprintf(pFile, "ENEMY_ONE %i \n", entities[1]._healthPoints);
+    fprintf(pFile, "POSITION %f %f\n", entities[1]._position.x, entities[1]._position.y);
+
+    fprintf(pFile, "ENEMY_TWO %i \n", entities[2]._healthPoints);
+    fprintf(pFile, "POSITION %f %f\n", entities[2]._position.x, entities[2]._position.y);
+
+    fprintf(pFile, "ENEMY_THREE %i \n", entities[3]._healthPoints);
+    fprintf(pFile, "POSITION %f %f\n", entities[3]._position.x, entities[3]._position.y);
+
+    fprintf(pFile, "ITEM_ONE %i \n", entities[4]._healthPoints);
+    fprintf(pFile, "ITEM_TWO %i \n", entities[5]._healthPoints);
+    fprintf(pFile, "ITEM_THREE %i \n", entities[6]._healthPoints);
+    fprintf(pFile, "ITEM_FOUR %i \n", entities[7]._healthPoints);
+    fprintf(pFile, "ITEM_FIVE %i \n", entities[8]._healthPoints);
+
+    fclose (pFile);
+}
+
 int main(){
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "miss ko na siya");
     SetTargetFPS(FPS);
@@ -79,7 +104,6 @@ int main(){
             } else {
                 allTiles[i].has_collision = true;
             }
-            std::cout << i << "|" << allTiles[i].has_collision << std::endl;
         }
         fscanf(configFile, "GRID %i %i\n", &gridSizeX, &gridSizeY);
         for(int i = 0; i < gridSizeY; i++){
@@ -184,6 +208,73 @@ int main(){
             item5.HandleCollision(&enemy1, delta_time);
             item5.HandleCollision(&enemy2, delta_time);
             item5.Update(delta_time);
+        }
+
+        if(IsKeyPressed(KEY_F)){
+            Entity entities[9];
+            entities[0] = player;
+            entities[1] = enemy1;
+            entities[2] = enemy2;
+            entities[3] = enemy3;
+            entities[4] = item1;
+            entities[5] = item2;
+            entities[6] = item3;
+            entities[7] = item4;
+            entities[8] = item5;
+            saveFile(entities);
+        }
+
+        if(IsKeyPressed(KEY_G)){
+            int playerHP;
+            int enemy1HP;
+            int enemy2HP;
+            int enemy3HP;
+            int i1hp;
+            int i2hp;
+            int i3hp;
+            int i4hp;
+            int i5hp;
+
+            FILE* configFile = fopen("saveslot.txt", "r");
+            if (configFile) {
+                float px, py, e1x, e1y, e2x, e2y, e3x, e3y;
+
+                fscanf(configFile, "PLAYER %i\n", &playerHP);
+                fscanf(configFile, "POSITION %f %f\n", &px, &py);
+                player._healthPoints = playerHP;
+                player._position = {(float) px, (float) py};
+
+                fscanf(configFile, "ENEMY_ONE %i \n", &enemy1HP);
+                fscanf(configFile, "POSITION %f %f\n", &e1x, &e1y);
+                enemy1._healthPoints = enemy1HP;
+                enemy1._position = {(float) e1x, (float) e1y};
+
+                fscanf(configFile, "ENEMY_TWO %i \n", &enemy2HP);
+                fscanf(configFile, "POSITION %f %f\n", &e2x, &e2y);
+                enemy2._healthPoints = enemy2HP;
+                enemy2._position = {(float) e2x, (float) e2y};
+
+                fscanf(configFile, "ENEMY_THREE %i \n", &enemy3HP);
+                fscanf(configFile, "POSITION %f %f\n", &e3x, &e3y);
+                enemy3._healthPoints = enemy3HP;
+                enemy3._position = {(float) e3x, (float) e3y};
+
+                fscanf(configFile, "ITEM_ONE %i \n", &enemy1HP);
+                item1._healthPoints = i1hp;
+                fscanf(configFile, "ITEM_TWO %i \n", &enemy1HP);
+                item2._healthPoints = i2hp;
+                fscanf(configFile, "ITEM_THREE %i \n", &enemy1HP);
+                item3._healthPoints = i3hp;
+                fscanf(configFile, "ITEM_FOUR %i \n", &enemy1HP);
+                item4._healthPoints = i4hp;
+                fscanf(configFile, "ITEM_FIVE %i \n", &enemy1HP);
+                item5._healthPoints = i5hp;
+                
+                fclose(configFile);
+                std::cout << "Config file SUCCESS\n";
+            } else {
+            std::cerr << "Error";
+            }
         }
 
         BeginDrawing();
