@@ -278,7 +278,7 @@ int main(){
         }
 
         BeginDrawing();
-        ClearBackground(WHITE);
+        ClearBackground({24, 33, 93, 255});
         BeginMode2D(camera_view);
         for(int i = 0; i < grid.size(); i++){
             std::vector<int> row = grid[i];
